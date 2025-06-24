@@ -36,6 +36,42 @@
 #include <thread>
 #include <vector>
 
+// === PATCH: GGML backend/scheduler CPU-only stubs for Android/Quest ===
+#if defined(GGML_NO_BACKEND)
+extern "C" {
+#include "ggml-backend.h"
+#include "ggml-cpu.h"
+#include "ggml-alloc.h"
+
+struct ggml_backend_buffer * ggml_backend_alloc_ctx_tensors(struct ggml_context * ctx, ggml_backend_t backend) { return NULL; }
+void ggml_backend_tensor_set(struct ggml_tensor * tensor, const void * data, size_t offset, size_t size) { }
+int ggml_backend_sched_get_n_backends(ggml_backend_sched_t sched) { return 1; }
+ggml_backend_t ggml_backend_sched_get_backend(ggml_backend_sched_t sched, int i) { return NULL; }
+void ggml_backend_free(ggml_backend_t backend) { }
+bool ggml_backend_is_cpu(ggml_backend_t backend) { return true; }
+ggml_backend_t ggml_backend_cpu_init(void) { return NULL; }
+ggml_backend_sched_t ggml_backend_sched_init(void) { return NULL; }
+void ggml_backend_sched_free(ggml_backend_sched_t sched) { }
+enum ggml_status ggml_backend_sched_graph_compute(ggml_backend_sched_t sched, struct ggml_cgraph * graph) { return (enum ggml_status)0; }
+void ggml_backend_sched_graph_init(ggml_backend_sched_t sched, struct ggml_cgraph * graph) { }
+size_t ggml_backend_sched_get_buffer_size(ggml_backend_sched_t sched, ggml_backend_t backend) { return 0; }
+ggml_backend_buffer_t ggml_backend_alloc_ctx_tensors_from_buft(struct ggml_context * ctx, ggml_backend_buffer_type_t buft) { return NULL; }
+void ggml_backend_buffer_clear(ggml_backend_buffer_t buffer, uint8_t value) { }
+void ggml_backend_buffer_free(ggml_backend_buffer_t buffer) { }
+bool ggml_backend_buffer_is_host(ggml_backend_buffer_t buffer) { return true; }
+size_t ggml_backend_buffer_get_size(ggml_backend_buffer_t buffer) { return 0; }
+const char * ggml_backend_buffer_name(ggml_backend_buffer_t buffer) { return "stub"; }
+void ggml_backend_buffer_set_usage(ggml_backend_buffer_t buffer, enum ggml_backend_buffer_usage usage) { }
+size_t ggml_backend_dev_count(void) { return 0; }
+ggml_backend_dev_t ggml_backend_dev_get(size_t index) { return NULL; }
+const char * ggml_backend_dev_name(ggml_backend_dev_t device) { return "stub"; }
+enum ggml_backend_dev_type ggml_backend_dev_type(ggml_backend_dev_t device) { return (enum ggml_backend_dev_type)0; }
+ggml_backend_t ggml_backend_dev_init(ggml_backend_dev_t device, const char * params) { return NULL; }
+ggml_backend_t ggml_backend_init_by_type(enum ggml_backend_dev_type type, const char * params) { return NULL; }
+}
+#endif
+// === END PATCH ===
+
 #if defined(WHISPER_BIG_ENDIAN)
 template<typename T>
 static T byteswap(T value) {
